@@ -4,7 +4,9 @@ public class MainClass {
 
 	public static void main(String[] orgs) {
 		LeetCode1 l1 = new LeetCode1();
-		l1.longestPalindrome("babad");
-		System.out.print(l1.longestPalindrome("babad"));
+		
+		String[] strs = new String[] {"aa","a"};
+		
+		System.out.print(l1.longestCommonPrefix(strs));
 	}
 }

@@ -1,6 +1,9 @@
 package March;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import Classes.ListNode;
 
@@ -101,5 +104,184 @@ public class LeetCode1 {
 		}
 		return r - l - 1;
 	}
+	
+	//6. ZigZag Conversion
+	public String convert(String s, int r) {
+		if(r <= 1) return s;
+		String res = "";
+        int len = s.length();
+        for(int i = 1; i <= r; i++) {
+        		int cur = i;
+        		while(cur <= len) {
+    				res += s.charAt(cur - 1);
+        			if((cur - 1)%(r - 1) != 0 && cur + 2 * (r - i) <= len) {
+        				res += s.charAt(cur + 2 * (r - i) - 1);
+        			}
+    				cur += 2 * (r - 1);
+        		}
+        }
+        return res;
+    }
+	
+	//7. Reverse Integer
+	public int reverse(int x) {
+        int res = 0, sign = res < 0 ? -1 : 1;
+        x = x * sign;
+        while(x != 0) {
+    			if ((res * 10 + x%10 - x%10) / 10 != res) return 0;
+        		res = res * 10 + x%10;
+        		x = x/10;
+        }
+        return res * sign;
+    }
+	
+	//8. String to Integer (atoi)
+	public static int myAtoi(String str) {
+	    if (str.isEmpty()) return 0;
+	    int sign = 1, base = 0, i = 0;
+	    while (str.charAt(i) == ' ')
+	        i++;
+	    if (str.charAt(i) == '-' || str.charAt(i) == '+')
+	        sign = str.charAt(i++) == '-' ? -1 : 1;
+	    while (i < str.length() && str.charAt(i) >= '0' && str.charAt(i) <= '9') {
+	        if (base > Integer.MAX_VALUE / 10 || (base == Integer.MAX_VALUE / 10 && str.charAt(i) - '0' > Integer.MAX_VALUE % 10)) {
+	            return (sign == 1) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+	        }
+	        base = 10 * base + (str.charAt(i++) - '0');
+	    }
+	    return base * sign;
+	}
+	
+	//9. Palindrome Number
+	//consider the boundry conditions
+	public boolean isPalindrome(int x) {
+		if(x < 0 || (x % 10 == 0 && x > 0)) return false;
+        int revert = 0;
+        while(revert <= x) {
+        		if(revert == x || revert == x / 10) return true;
+        		revert = revert * 10 + x % 10;
+        		x = x / 10;
+        }
+        return false;
+    }
+	
+	//10. Regular Expression Matching
+	//dynamic programming, consider the boundry conditions first!!!!!!!!!!!!!!!
+	public boolean isMatch(String s, String p) {
+		if (s == null || p == null) return false;
+		boolean[][] dp = new boolean[s.length() + 1][p.length() + 1];
+		dp[0][0] = true;
+		for (int i = 0; i < p.length(); i++) {
+	        if (p.charAt(i) == '*' && dp[0][i - 1]) dp[0][i+1] = true;
+	    }
+		for(int i = 0; i < s.length(); i++) {
+			for(int j = 0; j < p.length(); j++) {
+				char si = s.charAt(i), pj = p.charAt(j);
+				if(si == pj || pj == '.') {
+					dp[i + 1][j + 1] = dp[i][j];
+				} else if( pj == '*' && j > 0) {
+					if(p.charAt(j - 1) != si && p.charAt(j - 1) != '.') {
+						dp[i + 1][j + 1] = dp[i + 1][j - 1];
+					} else {
+						dp[i + 1][j + 1] = dp[i + 1][j - 1] || dp[i + 1][j] || dp[i][j + 1]; //empty || single || multiple
+					}
+				}
+			}
+		}
+		return dp[s.length()][p.length()];
+    }
+	
+	//11. Container With Most Water
+	public int maxArea(int[] height) {
+        int l = 0, r = height.length - 1, res = 0;
+        while(l < r) {
+        		res = Math.max(res, (r - l) * Math.min(height[l], height[r]));
+        		if(height[l] < height[r]) l++;
+        		else r--;
+        }
+        return res;
+    }
+	
+	//12. Integer to Roman
+	public String intToRoman(int num) {
+		String M[] = {"", "M", "MM", "MMM"};
+		String C[] = {"", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"};
+		String X[] = {"", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"};
+		String I[] = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"};
+		return M[num/1000] + C[(num%1000)/100] + X[(num%100)/10] + I[num%10];
+    }
+	
+	//13. Roman to Integer
+	public int romanToInt(String s) {
+		int res = 0;
+		for (int i = s.length() - 1; i >= 0; i--) {
+			char c = s.charAt(i);
+			switch (c) {
+			case 'I':
+				res += (res >= 5 ? -1 : 1);
+				break;
+			case 'V':
+				res += 5;
+				break;
+			case 'X':
+				res += 10 * (res >= 50 ? -1 : 1);
+				break;
+			case 'L':
+				res += 50;
+				break;
+			case 'C':
+				res += 100 * (res >= 500 ? -1 : 1);
+				break;
+			case 'D':
+				res += 500;
+				break;
+			case 'M':
+				res += 1000;
+				break;
+			}
+		}
+		return res;
+    }
+	
+	//14. Longest Common Prefix
+	public String longestCommonPrefix(String[] strs) {
+		if(strs.length == 0) return "";
+		String res = strs[0];
+		int i = 1;
+	    while(i < strs.length){
+	        while(strs[i].indexOf(res) != 0)
+	        		res = res.substring(0, res.length() - 1);
+	        i++;
+	    }
+	    return res;
+    }
+	
+	//15. 3Sum
+	public List<List<Integer>> threeSum(int[] nums) {
+		Arrays.sort(nums);
+		List<List<Integer>> res = new ArrayList<List<Integer>>();
+		for(int i = 0; i < nums.length - 2; i++) {
+			if(i > 0 && nums[i] == nums[i - 1]) continue;
+			int t = -nums[i];
+			int l = i + 1, r = nums.length - 1;
+			while(l < r) {
+				if(nums[l] + nums[r] == t) {
+					res.add(Arrays.asList(nums[i], nums[l], nums[r]));
+					while (l < r && nums[l] == nums[l + 1]) l++;
+					while (l < r && nums[r] == nums[r - 1]) r--;
+					l++;
+					r--;
+				} else if (nums[l] + nums[r] < t) l++;
+				else r--;
+			}
+		}
+		return res;
+    }
+	
+	
+	
+	
+	
+	
 	
 }
