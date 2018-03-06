@@ -2,8 +2,10 @@ package March;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Stack;
 
 import Classes.ListNode;
@@ -385,26 +387,17 @@ public class LeetCode1 {
 	public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 		ListNode res = new ListNode(-1);
 		ListNode cur = res;
-		while(l1 != null || l2 != null) {
-			if(l1 == null) {
-				cur.next = l2;
-				l2 = null;
-			}
-			else if(l2 == null) {
+		while(l1 != null && l2 != null) {
+			if(l1.val < l2.val) {
 				cur.next = l1;
-				l1 = null;
+				l1 = l1.next;
+			} else {
+				cur.next = l2;
+				l2 = l2.next;
 			}
-			else {
-				if(l1.val < l2.val) {
-					cur.next = l1;
-					l1 = l1.next;
-				} else {
-					cur.next = l2;
-					l2 = l2.next;
-				}
-				cur = cur.next;
-			}
+			cur = cur.next;
 		}
+		cur.next = l1 == null ? l2 : l1;
 		return res.next;
     }
 	
@@ -423,8 +416,60 @@ public class LeetCode1 {
 		if(close < open) generateParenthesis_helper(res, cur + ")", open, close, t);
 	}
 	
-	
-	
+	//23. Merge k Sorted Lists
+	//O(n * logK) //binary merge
+	public ListNode mergeKLists(ListNode[] lists) {
+		if(lists.length == 0) return null;
+		List<ListNode> res = new ArrayList<ListNode>();
+		for(ListNode node : lists) {
+			res.add(node);
+		}
+		while(res.size() > 1) {
+			int l = 0, r = res.size() - 1;
+			List<ListNode> cur = new ArrayList<ListNode>();
+			while(l < r) {
+				cur.add(mergeKLists_helper(res.get(l), res.get(r)));
+				l++;
+				r--;
+			}
+			if( l == r) cur.add(res.get(l));
+			res = cur;
+		}
+		return res.get(0);
+    }
+	private ListNode mergeKLists_helper(ListNode l1, ListNode l2) {
+		ListNode res = new ListNode(-1);
+		ListNode cur = res;
+		while(l1 != null && l2 != null) {
+			if(l1.val < l2.val) {
+				cur.next = l1;
+				l1 = l1.next;
+			} else {
+				cur.next = l2;
+				l2 = l2.next;
+			}
+			cur = cur.next;
+		}
+		cur.next = l1 == null ? l2 : l1;
+		return res.next;
+    }
+	//solution 2
+	//use priority queue
+//	public ListNode mergeKLists(ListNode[] lists) {
+//		PriorityQueue<ListNode> q = new PriorityQueue<ListNode>((ListNode l1, ListNode l2) -> Integer.compare(l1.val, l2.val));
+//		ListNode dummy = new ListNode(-1);
+//		ListNode cur = dummy;
+//		for(ListNode node : lists) {
+//			if(node!= null) q.add(node);
+//		}
+//		while(!q.isEmpty()) {
+//			ListNode peek = q.poll();
+//			cur.next = peek;
+//			cur = cur.next;
+//			if(peek.next != null) q.add(peek.next);
+//		}
+//		return dummy.next;
+//    }
 	
 	
 	
