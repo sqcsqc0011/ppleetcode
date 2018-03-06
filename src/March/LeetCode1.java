@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 import Classes.ListNode;
 
@@ -277,6 +278,151 @@ public class LeetCode1 {
 		}
 		return res;
     }
+	
+	//16. 3Sum Closest
+	public int threeSumClosest(int[] nums, int target) {
+		Arrays.sort(nums);
+		int res = nums[0] + nums[1] + nums[2], minGap = Math.abs(res - target);
+		for(int i = 0; i < nums.length - 2; i++) {
+			if(i > 0 && nums[i] == nums[i - 1]) continue;
+			int l = i + 1, r = nums.length - 1;
+			while(l < r) {
+				int sum = nums[i] + nums[l] + nums[r];
+				if(sum > target) {
+					r--;
+				} else {
+					l++;
+				}
+				if(Math.abs(sum - target) < minGap) {
+					res = sum;
+					minGap = Math.abs(res - target);
+				}
+			}
+		}
+		return res;
+    }
+	
+	//17. Letter Combinations of a Phone Number
+	public List<String> letterCombinations(String digits) {
+	    String[] maps = {"0", "1", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+	    List<String> res = new ArrayList<String>();
+	    if(digits.isEmpty()) return res;
+	    res.add("");
+	    for(int i = 0; i < digits.length(); i++) {
+	    		char ch = digits.charAt(i);
+	    		if(ch >= '2' && ch <= '9') {
+	    			List<String> add = new ArrayList<String>();
+	    			for(int j = 0; j < res.size(); j++) {
+	    				String chs = maps[ch - '0'];
+	    				for(int k = 0; k < chs.length(); k++) {
+	    					add.add(res.get(j) + chs.charAt(k));
+	    				}
+	    			}
+	    			res = add;
+	    		}
+	    }
+	    return res;
+    }
+	
+	//18. 4Sum
+	public List<List<Integer>> fourSum(int[] nums, int target) {
+		List<List<Integer>> res = new ArrayList<List<Integer>>();
+		Arrays.sort(nums);
+		for(int i = 0; i < nums.length - 3; i++) {
+			if(i > 0 && nums[i] == nums[i - 1]) continue;
+			for(int j = i + 1; j < nums.length - 2; j++) {
+				if(j > i + 1 && nums[j] == nums[j - 1]) continue;
+				int t = target - nums[i] - nums[j];
+				int l = j + 1, r = nums.length - 1;
+				while(l < r) {
+					if(nums[l] + nums[r] == t) {
+						res.add(Arrays.asList(nums[i], nums[j], nums[l], nums[r]));
+						while(l < r && nums[l] == nums[l + 1]) l++;
+						while(l < r && nums[r] == nums[r - 1]) r--;
+						l++;
+						r--;
+					} else if(nums[l] + nums[r] < t) l++;
+					else r--;
+				}
+			}
+		}
+		return res;
+    }
+	
+	//19. Remove Nth Node From End of List
+	public ListNode removeNthFromEnd(ListNode head, int n) {
+		ListNode dummy = new ListNode(-1);
+		dummy.next = head;
+		ListNode fast = dummy, snow = dummy;
+		for(int i = 1; i <= n + 1; i++) {
+			fast = fast.next;
+		}
+		while(fast != null) {
+			fast = fast.next;
+			snow = snow.next;
+		}
+		snow.next = snow.next.next;
+		return dummy.next;
+    }
+	
+	//20. Valid Parentheses
+	public boolean isValid(String s) {
+		Stack<Character> stack = new Stack<Character>();
+		for (char c : s.toCharArray()) {
+			if (c == '(')
+				stack.push(')');
+			else if (c == '{')
+				stack.push('}');
+			else if (c == '[')
+				stack.push(']');
+			else if (stack.isEmpty() || stack.pop() != c)
+				return false;
+		}
+		return stack.isEmpty();
+    }
+	
+	//21. Merge Two Sorted Lists
+	public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+		ListNode res = new ListNode(-1);
+		ListNode cur = res;
+		while(l1 != null || l2 != null) {
+			if(l1 == null) {
+				cur.next = l2;
+				l2 = null;
+			}
+			else if(l2 == null) {
+				cur.next = l1;
+				l1 = null;
+			}
+			else {
+				if(l1.val < l2.val) {
+					cur.next = l1;
+					l1 = l1.next;
+				} else {
+					cur.next = l2;
+					l2 = l2.next;
+				}
+				cur = cur.next;
+			}
+		}
+		return res.next;
+    }
+	
+	//22. Generate Parentheses
+	public List<String> generateParenthesis(int n) {
+		List<String> res = new ArrayList<String>();
+		generateParenthesis_helper(res, "", 0, 0, n);
+		return res;
+    }
+	private void generateParenthesis_helper(List<String> res, String cur, int open, int close, int t) {
+		if(open + close == t * 2) {
+			res.add(cur);
+			return;
+		}
+		if(open < t) generateParenthesis_helper(res, cur + "(", open + 1, close, t);
+		if(close < open) generateParenthesis_helper(res, cur + ")", open, close, t);
+	}
+	
 	
 	
 	
